@@ -1,0 +1,433 @@
+/* ============================================================
+   BrainDump — Premium Açık Tema (Light Theme)
+   Renk Paleti: Monochrome (Açık Zinc) + Zümrüt Yeşili Pop
+   ============================================================ */
+
+/* ---- Genel Uygulama Stilleri ---- */
+QMainWindow {
+    background-color: #f4f4f5;
+    color: #18181b;
+}
+
+QWidget {
+    background-color: transparent;
+    color: #18181b;
+    font-family: "Inter", "Segoe UI", sans-serif;
+    font-size: 14px;
+}
+
+QWidget#central_widget {
+    background-color: #f4f4f5;
+    border: 1px solid #e4e4e7; /* 1px modern dış sınır çizgisi */
+}
+
+/* ---- Özel Başlık Çubuğu (Title Bar) ---- */
+QWidget#custom_title_bar {
+    background-color: #e4e4e7;
+    border-bottom: 1px solid #d4d4d8;
+}
+
+QLabel#title_bar_text {
+    font-weight: 700;
+    color: #18181b;
+}
+
+QPushButton#title_btn_minimize,
+QPushButton#title_btn_maximize,
+QPushButton#title_btn_close {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+
+QPushButton#title_btn_minimize:hover,
+QPushButton#title_btn_maximize:hover {
+    background-color: rgba(24, 24, 27, 0.06);
+}
+
+QPushButton#title_btn_close:hover {
+    background-color: #ef4444;
+}
+
+/* ---- Scroll Area ---- */
+QScrollArea {
+    border: none;
+    background-color: transparent;
+}
+
+QScrollArea > QWidget > QWidget {
+    background-color: transparent;
+}
+
+QScrollBar:vertical {
+    background-color: #f4f4f5;
+    width: 8px;
+    margin: 0;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #d4d4d8;
+    min-height: 30px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #10B981;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical,
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    height: 0;
+    background: none;
+    border: none;
+}
+
+QScrollBar:horizontal {
+    background-color: #f4f4f5;
+    height: 8px;
+    margin: 0;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: #d4d4d8;
+    min-width: 30px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background-color: #10B981;
+}
+
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal,
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    width: 0;
+    background: none;
+    border: none;
+}
+
+/* ---- Sidebar ---- */
+QWidget#sidebar {
+    background-color: #e4e4e7;
+    border-right: 1px solid #d4d4d8;
+}
+
+QPushButton#sidebar_toggle_btn {
+    background-color: transparent;
+    border: none;
+    color: #71717a;
+    padding: 12px;
+    text-align: left;
+    font-size: 18px;
+}
+
+QPushButton#sidebar_toggle_btn:hover {
+    color: #059669;
+    background-color: rgba(16, 185, 129, 0.06);
+    border-radius: 8px;
+}
+
+/* Sidebar Logo/Brand */
+QLabel#sidebar_brand {
+    color: #059669;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 0 8px;
+    letter-spacing: 0.5px;
+}
+
+/* Sidebar Menü Öğeleri */
+QPushButton#sidebar_btn {
+    background-color: transparent;
+    border: none;
+    border-radius: 8px;
+    color: #71717a;
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 2px 8px;
+}
+
+QPushButton#sidebar_btn:hover {
+    background-color: rgba(16, 185, 129, 0.06);
+    color: #18181b;
+}
+
+QPushButton#sidebar_btn[active="true"] {
+    background-color: rgba(16, 185, 129, 0.12);
+    color: #059669;
+    font-weight: 600;
+}
+
+/* ---- Status Bar ---- */
+QStatusBar {
+    background-color: #e4e4e7;
+    color: #71717a;
+    border-top: 1px solid #d4d4d8;
+    font-size: 12px;
+    padding: 4px 12px;
+}
+
+QStatusBar QLabel {
+    color: #71717a;
+    font-size: 12px;
+}
+
+/* ---- Sayfa Başlıkları ---- */
+QLabel#page_title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #18181b;
+    padding-bottom: 4px;
+    letter-spacing: -0.5px;
+}
+
+QLabel#page_subtitle {
+    font-size: 14px;
+    color: #71717a;
+    padding-bottom: 16px;
+}
+
+/* ---- Dashboard Sayfası ---- */
+QLabel#welcome_title {
+    font-size: 30px;
+    font-weight: 800;
+    color: #18181b;
+    padding: 0;
+    letter-spacing: -0.5px;
+}
+
+QLabel#welcome_subtitle {
+    font-size: 15px;
+    color: #71717a;
+    padding-bottom: 24px;
+}
+
+QFrame#action_card {
+    background-color: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+QFrame#action_card:hover {
+    border-color: #10B981;
+    background-color: #fcfcfd;
+}
+
+QFrame#action_card QLabel#card_title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #18181b;
+    padding: 8px 0 4px 0;
+}
+
+QFrame#action_card QLabel#card_desc {
+    font-size: 12px;
+    color: #71717a;
+}
+
+/* Son Aktiviteler Bölümü */
+QFrame#activity_section {
+    background-color: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 12px;
+}
+
+QWidget#activity_item {
+    background-color: #f4f4f5;
+    border-radius: 8px;
+    padding: 10px 16px;
+}
+
+QWidget#activity_item:hover {
+    background-color: #e4e4e7;
+}
+
+QLabel#activity_text {
+    color: #18181b;
+    font-weight: 500;
+}
+
+QLabel#activity_time {
+    color: #71717a;
+    font-size: 12px;
+}
+
+/* ---- Formlar ve Giriş Elemanları ---- */
+QLineEdit, QTextEdit, QComboBox {
+    background-color: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #18181b;
+}
+
+QLineEdit:focus, QTextEdit:focus, QComboBox:focus {
+    border: 1px solid #10B981;
+    background-color: #ffffff;
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 30px;
+}
+
+QComboBox::down-arrow {
+    image: none;
+}
+
+/* ---- Butonlar ---- */
+QPushButton#primary_btn {
+    background-color: #10B981;
+    color: #000000;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+}
+
+QPushButton#primary_btn:hover {
+    background-color: #34d399;
+}
+
+QPushButton#primary_btn:pressed {
+    background-color: #059669;
+    padding-top: 11px;
+    padding-bottom: 9px;
+}
+
+QPushButton#secondary_btn {
+    background-color: transparent;
+    border: 1px solid #e4e4e7;
+    color: #18181b;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+}
+
+QPushButton#secondary_btn:hover {
+    background-color: rgba(24, 24, 27, 0.04);
+    border-color: #d4d4d8;
+}
+
+QPushButton#secondary_btn:pressed {
+    background-color: rgba(24, 24, 27, 0.08);
+    padding-top: 11px;
+    padding-bottom: 9px;
+}
+
+QPushButton#danger_btn {
+    background-color: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #dc2626;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+}
+
+QPushButton#danger_btn:hover {
+    background-color: #ef4444;
+    color: #ffffff;
+}
+
+QPushButton#danger_btn:pressed {
+    padding-top: 9px;
+    padding-bottom: 7px;
+}
+
+/* ---- Kart Listeleri (Notlar ve Hedefler için) ---- */
+QFrame#item_card {
+    background-color: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 12px;
+}
+
+QFrame#item_card:hover {
+    border-color: #10B981;
+    background-color: #fcfcfd;
+}
+
+QLabel#item_title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #18181b;
+}
+
+QLabel#item_desc {
+    color: #71717a;
+    font-size: 13px;
+}
+
+QLabel#item_meta {
+    color: #a1a1aa;
+    font-size: 11px;
+}
+
+QLabel#item_badge {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* ---- Hedef (Goal) Checkbox & List ---- */
+QCheckBox {
+    spacing: 12px;
+    color: #18181b;
+    font-size: 14px;
+}
+
+QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #e4e4e7;
+    border-radius: 6px;
+    background-color: #ffffff;
+}
+
+QCheckBox::indicator:hover {
+    border-color: #10B981;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #10B981;
+    border-color: #10B981;
+}
+
+/* ---- Ayarlar ve İstatistikler ---- */
+QLabel#setting_label {
+    font-weight: 600;
+    color: #18181b;
+}
+
+QFrame#stat_card {
+    background-color: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 12px;
+}
+
+QLabel#stat_val {
+    font-size: 32px;
+    font-weight: 800;
+    color: #059669;
+}
+
+QLabel#stat_lbl {
+    font-size: 12px;
+    color: #71717a;
+}
+
+/* ---- Dialoglar ---- */
+QDialog {
+    background-color: #ffffff;
+    border: 1px solid #e4e4e7;
+}
