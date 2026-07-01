@@ -199,6 +199,7 @@ class AddGoalDialog(BaseModernDialog):
             " padding: 6px 12px; color: #f4f4f5; font-size: 13px; }"
             "QLineEdit:focus { border-color: #10B981; }"
         )
+        self.input_text.returnPressed.connect(self.accept)
         self.layout.addWidget(self.input_text)
 
         # 2. Periyot Seçimi

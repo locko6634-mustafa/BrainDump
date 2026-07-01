@@ -24,5 +24,25 @@
             "github desktop"
         ],
         "date": "30 Haz 2026"
+    },
+    {
+        "id": "9afa637f-1cc2-4522-9848-aa7904fc34b0",
+        "title": "kısayol",
+        "content": "siyah kısayol kutusu hatası giderildi.",
+        "category": "Genel",
+        "tags": [
+            "kısayol"
+        ],
+        "date": "30 Haz 2026"
+    },
+    {
+        "id": "70f18865-5252-4612-afc5-9985ebd5264b",
+        "title": "hepsiburada",
+        "content": "proje genel anlamda bitti geliştirilmeye devam edilicek detaylar günlük hedefler alanında.",
+        "category": "Genel",
+        "tags": [
+            "proje geliştirme"
+        ],
+        "date": "2 Tem 2026"
     }
 ]

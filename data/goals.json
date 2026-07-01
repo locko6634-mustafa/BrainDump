@@ -6,5 +6,45 @@
         "period": "weekly",
         "progress": 0,
         "total_progress": 1
+    },
+    {
+        "id": "3e4d1121-6eed-482d-820c-ceda8f5e526a",
+        "text": "banner alanı detaylandırılıcak birden fazla görsel linki eklemeye izin verilicek.",
+        "completed": false,
+        "period": "weekly",
+        "progress": 0,
+        "total_progress": 1
+    },
+    {
+        "id": "3636e321-1dbd-421d-83ef-33c6b14fb936",
+        "text": "link olarak görsel eklemeye ek olarak kullanıcı briefine görsel eki veya ekleri ekleyebilecek",
+        "completed": false,
+        "period": "weekly",
+        "progress": 0,
+        "total_progress": 1
+    },
+    {
+        "id": "eb858964-edb5-4a07-91d1-ea001b68fcfc",
+        "text": "grup mantığı eş zamanlı çoklu kullanıcı test edilecek çakışma bozulma kontrolü yapılcak",
+        "completed": false,
+        "period": "weekly",
+        "progress": 0,
+        "total_progress": 1
+    },
+    {
+        "id": "b8bc2417-98ce-4ea7-960b-9fea3907a285",
+        "text": "sosyal medya görsel-caption otomasyonu ürünleştirilecek",
+        "completed": false,
+        "period": "monthly",
+        "progress": 0,
+        "total_progress": 1
+    },
+    {
+        "id": "f4b22502-a630-4fd0-8792-ff29ad0a147f",
+        "text": "randevu otomasyonu randevu paneli ürünleştirilecek",
+        "completed": false,
+        "period": "monthly",
+        "progress": 0,
+        "total_progress": 1
     }
 ]
