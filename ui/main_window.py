@@ -12,7 +12,7 @@ from PyQt6.QtCore import (
     Qt, QPropertyAnimation, QEasingCurve,
     QParallelAnimationGroup, QPoint, QRect
 )
-from PyQt6.QtGui import QFont
+from PyQt6.QtGui import QFont, QShortcut, QKeySequence
 
 from ui.sidebar import Sidebar
 from ui.widgets.dashboard_page import DashboardPage
@@ -134,6 +134,9 @@ class MainWindow(QMainWindow):
         # İlk sayfa: Dashboard
         self._stacked_widget.setCurrentIndex(0)
         self._current_page_index = 0
+
+        # --- Klavye Kısayolları ---
+        self._setup_shortcuts()
 
     def _on_page_changed(self, index: int):
         """Sidebar'dan gelen sayfa değişikliği sinyalini işler."""
@@ -304,5 +307,48 @@ class MainWindow(QMainWindow):
         self._resize_direction = None
         self.unsetCursor()
         super().mouseReleaseEvent(event)
+
+    def _setup_shortcuts(self):
+        """Uygulama genelindeki klavye kısayollarını tanımlar."""
+        # Dashboard: Ctrl+D
+        self.shortcut_dashboard = QShortcut(QKeySequence("Ctrl+D"), self)
+        self.shortcut_dashboard.activated.connect(lambda: self._switch_to_page(0))
+        
+        # Yeni Not: Ctrl+N
+        self.shortcut_new_note = QShortcut(QKeySequence("Ctrl+N"), self)
+        self.shortcut_new_note.activated.connect(lambda: self._switch_to_page(1))
+        
+        # Notlarım: Ctrl+L
+        self.shortcut_notes = QShortcut(QKeySequence("Ctrl+L"), self)
+        self.shortcut_notes.activated.connect(lambda: self._switch_to_page(2))
+        
+        # Hedeflerim: Ctrl+H
+        self.shortcut_goals = QShortcut(QKeySequence("Ctrl+H"), self)
+        self.shortcut_goals.activated.connect(lambda: self._switch_to_page(3))
+        
+        # İstatistikler: Ctrl+I
+        self.shortcut_stats = QShortcut(QKeySequence("Ctrl+I"), self)
+        self.shortcut_stats.activated.connect(lambda: self._switch_to_page(4))
+        
+        # Ayarlar: Ctrl+Comma
+        self.shortcut_settings = QShortcut(QKeySequence("Ctrl+,"), self)
+        self.shortcut_settings.activated.connect(lambda: self._switch_to_page(5))
+        
+        # Esc tuşu ile kapatma/iptal
+        self.shortcut_escape = QShortcut(QKeySequence("Escape"), self)
+        self.shortcut_escape.activated.connect(self._on_escape_pressed)
+
+    def _switch_to_page(self, index: int):
+        """Sidebar'ı tetikleyerek sayfaya geçiş yapar."""
+        self._sidebar.set_current_index(index)
+        self._on_page_changed(index)
+
+    def _on_escape_pressed(self):
+        """Escape tuşu basıldığında detay pencerelerini veya Yeni Not sayfasını kapatır."""
+        if self._current_page_index == 1:
+            new_note_page = self._pages[1]
+            if hasattr(new_note_page, "_on_cancel_clicked"):
+                new_note_page._on_cancel_clicked()
+
 
 

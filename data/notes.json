@@ -5,7 +5,7 @@
         "content": "bugün otomasyonun algoritması kuruldu meta postları hazırlanıyor story görselleri hazırlanıyor",
         "category": "Proje",
         "tags": [],
-        "date": "29 Haz 2026"
+        "date": "2026-06-29"
     },
     {
         "id": "1054d153-1db7-49e2-a571-6b31dd0c9f38",
@@ -13,7 +13,7 @@
         "content": "switchteki 4 kol doldurulucak detaylı testleri yapılıcak uygun banner ölçüleri alınıcak promptlar çok sıkı testlerden geçicek ve teslim edilicek.",
         "category": "Proje",
         "tags": [],
-        "date": "29 Haz 2026"
+        "date": "2026-06-29"
     },
     {
         "id": "e09e0fc0-f0b8-4569-8f63-0407fd254561",
@@ -23,17 +23,7 @@
         "tags": [
             "github desktop"
         ],
-        "date": "30 Haz 2026"
-    },
-    {
-        "id": "9afa637f-1cc2-4522-9848-aa7904fc34b0",
-        "title": "kısayol",
-        "content": "siyah kısayol kutusu hatası giderildi.",
-        "category": "Genel",
-        "tags": [
-            "kısayol"
-        ],
-        "date": "30 Haz 2026"
+        "date": "2026-06-30"
     },
     {
         "id": "70f18865-5252-4612-afc5-9985ebd5264b",
@@ -43,6 +33,6 @@
         "tags": [
             "proje geliştirme"
         ],
-        "date": "2 Tem 2026"
+        "date": "2026-07-02"
     }
 ]

@@ -9,11 +9,10 @@ from datetime import datetime
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QCheckBox, QProgressBar, QPushButton, QFrame,
-    QScrollArea, QGraphicsOpacityEffect, QComboBox,
-    QSpinBox, QButtonGroup, QLineEdit
+    QScrollArea, QComboBox, QSpinBox, QButtonGroup, QLineEdit
 )
 from PyQt6.QtCore import (
-    Qt, QPropertyAnimation, QEasingCurve, pyqtSignal, QTimer
+    Qt, pyqtSignal, QTimer
 )
 import qtawesome as qta
 from core.json_manager import JSONManager
@@ -37,10 +36,6 @@ class GoalItem(QFrame):
         
         self.setObjectName("goal_item")
         self.setMinimumHeight(52)
-        self.setStyleSheet(
-            "QFrame#goal_item { background: #18181b; border: 1px solid #27272a;"
-            " border-radius: 10px; }"
-        )
 
         self.main_layout = QHBoxLayout(self)
         self.main_layout.setContentsMargins(16, 8, 16, 8)
@@ -55,6 +50,7 @@ class GoalItem(QFrame):
             counter_layout.setSpacing(6)
 
             self.minus_btn = QPushButton()
+            self.minus_btn.setObjectName("minus_btn")
             self.minus_btn.setIcon(qta.icon("mdi6.minus", color="#a0a0b8"))
             self.minus_btn.setFixedSize(24, 24)
             self.minus_btn.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -66,6 +62,7 @@ class GoalItem(QFrame):
             counter_layout.addWidget(self.minus_btn)
 
             self.plus_btn = QPushButton()
+            self.plus_btn.setObjectName("plus_btn")
             self.plus_btn.setIcon(qta.icon("mdi6.plus", color="#10B981"))
             self.plus_btn.setFixedSize(24, 24)
             self.plus_btn.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -81,14 +78,6 @@ class GoalItem(QFrame):
             # Standart Checkbox Arayüzü
             self.checkbox = QCheckBox()
             self.checkbox.setChecked(is_completed)
-            self.checkbox.setStyleSheet(
-                "QCheckBox::indicator { width: 20px; height: 20px;"
-                " border: 2px solid #27272a; border-radius: 4px;"
-                " background: transparent; }"
-                "QCheckBox::indicator:checked { background: #10B981;"
-                " border-color: #10B981; }"
-                "QCheckBox::indicator:hover { border-color: #34d399; }"
-            )
             self.checkbox.stateChanged.connect(self._on_state_changed)
             self.main_layout.addWidget(self.checkbox)
 
@@ -97,12 +86,12 @@ class GoalItem(QFrame):
         self.label_layout.setSpacing(2)
         
         self.label = QLabel(text)
-        self.label.setStyleSheet("font-size: 14px; color: #e8e8e8;")
+        self.label.setObjectName("goal_text")
         self.label_layout.addWidget(self.label)
 
         if self.total_progress > 1:
             self.lbl_progress = QLabel(f"İlerleme: {self.progress} / {self.total_progress}")
-            self.lbl_progress.setStyleSheet("font-size: 11px; color: #a0a0b8;")
+            self.lbl_progress.setObjectName("lbl_progress")
             self.label_layout.addWidget(self.lbl_progress)
             
         self.main_layout.addLayout(self.label_layout, stretch=1)
@@ -120,10 +109,6 @@ class GoalItem(QFrame):
         self.delete_btn.setIcon(qta.icon("mdi6.trash-can-outline", color="#FF5252"))
         self.delete_btn.setFixedSize(24, 24)
         self.delete_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.delete_btn.setStyleSheet(
-            "QPushButton { background: transparent; border: none; border-radius: 4px; }"
-            "QPushButton:hover { background: rgba(255, 82, 82, 0.15); }"
-        )
         self.delete_btn.clicked.connect(self._on_delete_clicked)
         self.main_layout.addWidget(self.delete_btn)
 
@@ -135,7 +120,6 @@ class GoalItem(QFrame):
         self.is_completed = is_completed
         self.update_style(is_completed)
         self.status_changed.emit(self.goal_id, is_completed)
-        self._notify_parent()
 
     def _increment_progress(self):
         if self.progress < self.total_progress:
@@ -144,7 +128,6 @@ class GoalItem(QFrame):
             self.lbl_progress.setText(f"İlerleme: {self.progress} / {self.total_progress}")
             self.update_style(self.is_completed)
             self.progress_changed.emit(self.goal_id, self.progress, self.is_completed)
-            self._notify_parent()
 
     def _decrement_progress(self):
         if self.progress > 0:
@@ -153,31 +136,31 @@ class GoalItem(QFrame):
             self.lbl_progress.setText(f"İlerleme: {self.progress} / {self.total_progress}")
             self.update_style(self.is_completed)
             self.progress_changed.emit(self.goal_id, self.progress, self.is_completed)
-            self._notify_parent()
-
-    def _notify_parent(self):
-        p = self.parentWidget()
-        while p is not None:
-            if hasattr(p, "update_progress"):
-                p.update_progress()
-                break
-            p = p.parentWidget()
 
     def _on_delete_clicked(self):
         self.delete_clicked.emit(self.goal_id)
 
     def update_style(self, is_completed: bool):
         self.is_completed = is_completed
-        self.label.setStyleSheet(
-            f"font-size: 14px; color: {'#6a6a8a' if is_completed else '#e8e8e8'};"
-            f" {'text-decoration: line-through;' if is_completed else ''}"
-        )
-        if self.total_progress > 1:
-            self.lbl_progress.setStyleSheet(
-                f"font-size: 11px; color: {'#52526b' if is_completed else '#a0a0b8'};"
-            )
+        
+        # Set dynamic QSS properties
+        self.label.setProperty("completed", is_completed)
+        if hasattr(self, "lbl_progress"):
+            self.lbl_progress.setProperty("completed", is_completed)
+            
+        # Font strikeout in code (QSS doesn't support text-decoration in QLabel)
+        font = self.label.font()
+        font.setStrikeOut(is_completed)
+        self.label.setFont(font)
+        
+        # Trigger style update
+        self.label.style().unpolish(self.label)
+        self.label.style().polish(self.label)
+        if hasattr(self, "lbl_progress"):
+            self.lbl_progress.style().unpolish(self.lbl_progress)
+            self.lbl_progress.style().polish(self.lbl_progress)
+            
         self.check_icon.setVisible(is_completed)
-
 
 
 class AddGoalDialog(BaseModernDialog):
@@ -190,38 +173,28 @@ class AddGoalDialog(BaseModernDialog):
         self.setMinimumWidth(380)
 
         # 1. Hedef Açıklaması
-        self.layout.addWidget(QLabel("Hedef Açıklaması:"))
+        lbl_desc = QLabel("Hedef Açıklaması:")
+        lbl_desc.setObjectName("dialog_info_label")
+        self.layout.addWidget(lbl_desc)
+        
         self.input_text = QLineEdit()
         self.input_text.setPlaceholderText("Örn: Kitap oku, spor yap...")
         self.input_text.setMinimumHeight(38)
-        self.input_text.setStyleSheet(
-            "QLineEdit { background: #18181b; border: 1px solid #27272a; border-radius: 8px;"
-            " padding: 6px 12px; color: #f4f4f5; font-size: 13px; }"
-            "QLineEdit:focus { border-color: #10B981; }"
-        )
         self.input_text.returnPressed.connect(self.accept)
         self.layout.addWidget(self.input_text)
 
         # 2. Periyot Seçimi
-        self.layout.addWidget(QLabel("Zaman Dilimi (Periyot):"))
+        lbl_period = QLabel("Zaman Dilimi (Periyot):")
+        lbl_period.setObjectName("dialog_info_label")
+        self.layout.addWidget(lbl_period)
+        
         self.combo_period = QComboBox()
         self.combo_period.addItems(["Günlük", "Haftalık", "Aylık"])
         self.combo_period.setMinimumHeight(38)
-        self.combo_period.setStyleSheet(
-            "QComboBox { background: #18181b; border: 1px solid #27272a; border-radius: 8px;"
-            " padding: 6px 12px; color: #f4f4f5; font-size: 13px; }"
-            "QComboBox:focus { border-color: #10B981; }"
-            "QComboBox QAbstractItemView { background: #18181b; color: #f4f4f5;"
-            " selection-background-color: #10B981; border: 1px solid #27272a; }"
-        )
         self.layout.addWidget(self.combo_period)
 
         # 3. Sayaçlı İlerleme Seçeneği
         self.check_is_counter = QCheckBox("Sayaçlı İlerleme Desteği (Örn: 20 sayfa okuma)")
-        self.check_is_counter.setStyleSheet(
-            "QCheckBox::indicator { width: 18px; height: 18px; border: 2px solid #27272a; border-radius: 4px; }"
-            "QCheckBox::indicator:checked { background: #10B981; border-color: #10B981; }"
-        )
         self.check_is_counter.stateChanged.connect(self._on_counter_changed)
         self.layout.addWidget(self.check_is_counter)
 
@@ -231,17 +204,13 @@ class AddGoalDialog(BaseModernDialog):
         counter_layout.setContentsMargins(0, 0, 0, 0)
         
         lbl_total = QLabel("Hedef Sayı / Sınır:")
-        lbl_total.setStyleSheet("font-size: 12px; color: #a0a0b8;")
+        lbl_total.setObjectName("dialog_info_label")
         counter_layout.addWidget(lbl_total)
         
         self.spin_total = QSpinBox()
         self.spin_total.setRange(2, 9999)
         self.spin_total.setValue(5)
         self.spin_total.setMinimumHeight(38)
-        self.spin_total.setStyleSheet(
-            "QSpinBox { background: #18181b; border: 1px solid #27272a; border-radius: 8px;"
-            " padding: 6px 12px; color: #f4f4f5; font-size: 13px; }"
-        )
         counter_layout.addWidget(self.spin_total, stretch=1)
         
         self.layout.addWidget(self.counter_widget)
@@ -253,24 +222,16 @@ class AddGoalDialog(BaseModernDialog):
         btn_layout.addStretch()
 
         self.cancel_btn = QPushButton("İptal")
+        self.cancel_btn.setObjectName("cancel_btn")
         self.cancel_btn.setMinimumHeight(36)
         self.cancel_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.cancel_btn.setStyleSheet(
-            "QPushButton { background: #18181b; border: 1px solid #27272a; border-radius: 6px;"
-            " color: #a1a1aa; padding: 0 16px; font-weight: 600; }"
-            "QPushButton:hover { border-color: #ef4444; color: #ef4444; }"
-        )
         self.cancel_btn.clicked.connect(self.reject)
         btn_layout.addWidget(self.cancel_btn)
 
         self.ok_btn = QPushButton("Ekle")
+        self.ok_btn.setObjectName("save_btn")
         self.ok_btn.setMinimumHeight(36)
         self.ok_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.ok_btn.setStyleSheet(
-            "QPushButton { background: #10B981; border: none; border-radius: 6px;"
-            " color: #09090b; padding: 0 20px; font-weight: 600; }"
-            "QPushButton:hover { background: #34d399; }"
-        )
         self.ok_btn.clicked.connect(self.accept)
         btn_layout.addWidget(self.ok_btn)
 
@@ -329,9 +290,6 @@ class GoalsPage(QWidget):
 
         page_title = QLabel("Hedeflerim")
         page_title.setObjectName("page_title")
-        page_title.setStyleSheet(
-            "font-size: 24px; font-weight: 700; color: #e8e8e8;"
-        )
         title_row.addWidget(page_title)
         title_row.addStretch()
         layout.addLayout(title_row)
@@ -345,10 +303,7 @@ class GoalsPage(QWidget):
         tarih_str = f"Bugün — {bugun.day} {ay_isimleri[bugun.month]} {bugun.year}"
 
         date_label = QLabel(tarih_str)
-        date_label.setObjectName("date_indicator")
-        date_label.setStyleSheet(
-            "font-size: 14px; color: #a0a0b8; margin-bottom: 4px;"
-        )
+        date_label.setObjectName("page_subtitle")
         layout.addWidget(date_label)
 
         # --- Zaman Periyodu Sekme Butonları ---
@@ -356,31 +311,20 @@ class GoalsPage(QWidget):
         period_layout.setSpacing(8)
         
         self.btn_group = QButtonGroup(self)
-        
-        # Ortak Buton Stili (Seçili butona 'active="true"' set edeceğiz)
-        btn_style = (
-            "QPushButton { background: #18181b; border: 1px solid #27272a; border-radius: 8px;"
-            " color: #a1a1aa; padding: 10px 16px; font-weight: 600; font-size: 13px; }"
-            "QPushButton:hover { border-color: #10B981; color: #ffffff; }"
-            "QPushButton[active=\"true\"] { background: rgba(16, 185, 129, 0.12); border-color: #10B981; color: #10B981; }"
-        )
 
         self.btn_daily = QPushButton("Günlük Hedefler")
-        self.btn_daily.setStyleSheet(btn_style)
         self.btn_daily.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_daily.setProperty("active", "true")
         self.btn_daily.clicked.connect(lambda: self._on_period_changed("daily"))
         period_layout.addWidget(self.btn_daily)
 
         self.btn_weekly = QPushButton("Haftalık Hedefler")
-        self.btn_weekly.setStyleSheet(btn_style)
         self.btn_weekly.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_weekly.setProperty("active", "false")
         self.btn_weekly.clicked.connect(lambda: self._on_period_changed("weekly"))
         period_layout.addWidget(self.btn_weekly)
 
         self.btn_monthly = QPushButton("Aylık Hedefler")
-        self.btn_monthly.setStyleSheet(btn_style)
         self.btn_monthly.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_monthly.setProperty("active", "false")
         self.btn_monthly.clicked.connect(lambda: self._on_period_changed("monthly"))
@@ -391,21 +335,18 @@ class GoalsPage(QWidget):
 
         # --- İlerleme çubuğu ---
         progress_frame = QFrame()
-        progress_frame.setStyleSheet(
-            "QFrame { background: #18181b; border: 1px solid #27272a;"
-            " border-radius: 12px; }"
-        )
+        progress_frame.setObjectName("form_frame")
         progress_layout = QVBoxLayout(progress_frame)
         progress_layout.setContentsMargins(20, 16, 20, 16)
         progress_layout.setSpacing(8)
 
         progress_header = QHBoxLayout()
         self.progress_title = QLabel("Günlük İlerleme")
-        self.progress_title.setStyleSheet("font-size: 14px; font-weight: 600; color: #e8e8e8;")
+        self.progress_title.setObjectName("section_title")
         progress_header.addWidget(self.progress_title)
 
         self.progress_value = QLabel("0/0 hedef")
-        self.progress_value.setStyleSheet("font-size: 12px; color: #a0a0b8;")
+        self.progress_value.setObjectName("lbl_progress")
         progress_header.addStretch()
         progress_header.addWidget(self.progress_value)
         progress_layout.addLayout(progress_header)
@@ -433,12 +374,8 @@ class GoalsPage(QWidget):
 
         # --- Motivasyon quote ---
         quote_label = QLabel('"Büyük hedefler küçük adımlarla başlar."')
-        quote_label.setObjectName("motivation_quote")
+        quote_label.setObjectName("hint_label")
         quote_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        quote_label.setStyleSheet(
-            "font-size: 13px; color: #10B981; font-style: italic;"
-            " margin-top: 24px; padding: 16px;"
-        )
         layout.addWidget(quote_label)
 
         layout.addStretch()
@@ -532,10 +469,22 @@ class GoalsPage(QWidget):
     def _on_goal_status_changed(self, goal_id, completed):
         """Hedef tamamlanma durumu değiştiğinde JSON dosyasını günceller."""
         self.db.update_goal_status(goal_id, completed)
+        self.update_progress()
+        
+        # Toast bildirimini tetikle (Task 6)
+        if completed:
+            from ui.toast import ToastManager
+            ToastManager.show(self, "Tebrikler! 🎉", "Hedefi başarıyla tamamladınız.", "success")
 
     def _on_goal_progress_changed(self, goal_id, progress, is_completed):
         """Sayaçlı hedef ilerlemesi değiştiğinde JSON dosyasını günceller."""
         self.db.update_goal(goal_id, progress=progress, completed=is_completed)
+        self.update_progress()
+        
+        # Eğer sayaç tamamlandıysa bildirim göster
+        if is_completed:
+            from ui.toast import ToastManager
+            ToastManager.show(self, "Tebrikler! 🎉", "Hedefi başarıyla tamamladınız.", "success")
 
     def _on_add_goal_clicked(self):
         """Kullanıcıdan yeni hedef alıp veritabanına ekler."""
@@ -551,11 +500,22 @@ class GoalsPage(QWidget):
                     total_progress=data["total_progress"]
                 )
                 self.load_goals()
+                # Toast bildirimini tetikle (Task 6)
+                from ui.toast import ToastManager
+                ToastManager.show(self, "Başarılı", "Yeni hedef başarıyla oluşturuldu.", "success")
 
     def _on_delete_goal(self, goal_id):
-        """Hedefi siler ve listeyi günceller."""
-        if self.db.delete_goal(goal_id):
-            self.load_goals()
-
-
-
+        """Hedefi silmeden önce onay alır ve listeyi günceller."""
+        from ui.widgets.dialogs import ModernConfirmDialog
+        ok = ModernConfirmDialog.confirm(
+            self,
+            "Hedefi Sil",
+            "Bu hedefi kalıcı olarak silmek istediğinizden emin misiniz?",
+            is_danger=True
+        )
+        if ok:
+            if self.db.delete_goal(goal_id):
+                self.load_goals()
+                # Toast bildirimini tetikle (Task 6)
+                from ui.toast import ToastManager
+                ToastManager.show(self, "Başarılı", "Hedef silindi.", "success")

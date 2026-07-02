@@ -9,7 +9,7 @@ import traceback
 
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QFontDatabase, QFont, QIcon
-from PyQt6.QtCore import Qt, qInstallMessageHandler, QtMsgType
+from PyQt6.QtCore import Qt, qInstallMessageHandler, QtMsgType, QSettings
 
 from ui.main_window import MainWindow
 
@@ -59,8 +59,16 @@ def load_font():
 
 
 def load_stylesheet() -> str:
-    """QSS tema dosyasını okur ve döndürür."""
-    qss_path = get_asset_path(os.path.join("assets", "styles.qss"))
+    """QSS tema dosyasını okur ve döndürür (kaydedilmiş temaya göre)."""
+    settings = QSettings("BrainDump", "BrainDump")
+    theme_name = settings.value("theme", "Koyu Tema")
+    
+    if theme_name == "Açık Tema":
+        file_name = "light_styles.qss"
+    else:
+        file_name = "styles.qss"
+        
+    qss_path = get_asset_path(os.path.join("assets", file_name))
     try:
         with open(qss_path, "r", encoding="utf-8") as f:
             return f.read()

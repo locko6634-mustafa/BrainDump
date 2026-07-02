@@ -6,16 +6,15 @@ Ana sayfa: karşılama mesajı, hızlı eylem kartları ve son aktiviteler.
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel,
-    QFrame, QScrollArea, QGraphicsDropShadowEffect
+    QFrame, QScrollArea
 )
 from PyQt6.QtCore import (
-    Qt, QTimer, QPropertyAnimation, QEasingCurve,
-    pyqtSignal
+    Qt, QTimer, pyqtSignal
 )
-from PyQt6.QtGui import QColor
 from datetime import datetime
 import qtawesome as qta
 from core.json_manager import JSONManager
+from core.utils import parse_turkish_date, format_date_tr
 from ui.animations import HoverCard, StaggerAnimationHelper
 
 
@@ -45,14 +44,12 @@ class ActionCard(HoverCard):
         title_label = QLabel(title)
         title_label.setObjectName("card_title")
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setStyleSheet("font-size: 15px; font-weight: 600; color: #e8e8e8; background: transparent;")
         layout.addWidget(title_label)
 
         # Açıklama
         desc_label = QLabel(description)
         desc_label.setObjectName("card_description")
         desc_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        desc_label.setStyleSheet("font-size: 12px; color: #a0a0b8; background: transparent;")
         layout.addWidget(desc_label)
 
     def mousePressEvent(self, event):
@@ -75,7 +72,6 @@ class DashboardPage(QWidget):
         outer_layout = QVBoxLayout(self)
         outer_layout.setContentsMargins(0, 0, 0, 0)
 
-
         # Scroll alanı
         scroll = QScrollArea()
         scroll.setObjectName("dashboard_scroll")
@@ -93,16 +89,10 @@ class DashboardPage(QWidget):
         # --- Karşılama bölümü ---
         self.welcome_title = QLabel("Merhaba! 👋")
         self.welcome_title.setObjectName("welcome_title")
-        self.welcome_title.setStyleSheet(
-            "font-size: 28px; font-weight: 700; color: #e8e8e8; margin-bottom: 0px;"
-        )
         self._content_layout.addWidget(self.welcome_title)
 
         self.welcome_subtitle = QLabel("Bugün harika şeyler başarabilirsin.")
         self.welcome_subtitle.setObjectName("welcome_subtitle")
-        self.welcome_subtitle.setStyleSheet(
-            "font-size: 14px; color: #a0a0b8; margin-top: 0px; margin-bottom: 8px;"
-        )
         self._content_layout.addWidget(self.welcome_subtitle)
 
         # --- Hızlı eylem kartları ---
@@ -130,19 +120,12 @@ class DashboardPage(QWidget):
         # --- Son Aktiviteler bölümü ---
         self.activity_section = QFrame()
         self.activity_section.setObjectName("activity_section")
-        self.activity_section.setStyleSheet(
-            "QFrame#activity_section { background: #18181b; border: 1px solid #27272a;"
-            " border-radius: 12px; padding: 8px; }"
-        )
         activity_layout = QVBoxLayout(self.activity_section)
         activity_layout.setContentsMargins(20, 16, 20, 16)
         activity_layout.setSpacing(12)
 
         activity_title = QLabel("Son Aktiviteler")
         activity_title.setObjectName("section_title")
-        activity_title.setStyleSheet(
-            "font-size: 16px; font-weight: 600; color: #e8e8e8;"
-        )
         activity_layout.addWidget(activity_title)
 
         # Aktivitelerin listeleneceği layout
@@ -164,20 +147,6 @@ class DashboardPage(QWidget):
         """Dashboard panelindeki dinamik verileri yeniler."""
         self.load_activities()
 
-    def _parse_date(self, date_str):
-        """Türkçe ay içeren not tarihlerini datetime nesnesine dönüştürür."""
-        turkish_months = {
-            "Oca": "Jan", "Şub": "Feb", "Mar": "Mar", "Nis": "Apr",
-            "May": "May", "Haz": "Jun", "Tem": "Jul", "Ağu": "Aug",
-            "Eyl": "Sep", "Eki": "Oct", "Kas": "Nov", "Ara": "Dec"
-        }
-        try:
-            for tr, eng in turkish_months.items():
-                date_str = date_str.replace(tr, eng)
-            return datetime.strptime(date_str, "%d %b %Y")
-        except Exception:
-            return None
-
     def load_activities(self):
         """Not ve hedef verilerinden karma son aktiviteler listesi oluşturup yükler."""
         # Eski widget'ları temizle
@@ -194,20 +163,28 @@ class DashboardPage(QWidget):
 
         # 1. Notlar (Eklenen Notlar)
         for note in notes:
-            note_date = self._parse_date(note.get("date", ""))
+            note_date = parse_turkish_date(note.get("date", ""))
             raw_activities.append({
                 "text": f"📝  Yeni not eklendi: {note['title']}",
-                "info": note.get("date", "Bilinmeyen Tarih"),
+                "info": format_date_tr(note_date),
                 "timestamp": note_date or datetime.min
             })
 
         # 2. Tamamlanan Hedefler
         for goal in goals:
             if goal.get("completed", False):
+                completed_date_str = goal.get("completed_at")
+                if completed_date_str:
+                    completed_date = parse_turkish_date(completed_date_str)
+                    info_text = format_date_tr(completed_date)
+                else:
+                    completed_date = datetime.now()
+                    info_text = "Bugün"
+
                 raw_activities.append({
                     "text": f"✅  '{goal['text']}' hedefi tamamlandı",
-                    "info": "Bugün",
-                    "timestamp": datetime.now()
+                    "info": info_text,
+                    "timestamp": completed_date
                 })
 
         # Zaman damgasına göre sırala (en yeni en üstte)
@@ -219,16 +196,11 @@ class DashboardPage(QWidget):
         if not display_activities:
             empty_row = QLabel("Henüz bir aktivite gerçekleşmedi.")
             empty_row.setObjectName("activity_row_empty")
-            empty_row.setStyleSheet("font-size: 13px; color: #6a6a8a; padding: 6px 0px; font-style: italic;")
             self.activity_list_layout.addWidget(empty_row)
         else:
             for act in display_activities:
                 row = QLabel(f"{act['text']} — {act['info']}")
                 row.setObjectName("activity_row")
-                row.setStyleSheet(
-                    "font-size: 13px; color: #a0a0b8; padding: 6px 0px;"
-                    " border-bottom: 1px solid #2a2a4a;"
-                )
                 self.activity_list_layout.addWidget(row)
 
     def showEvent(self, event):
@@ -239,4 +211,3 @@ class DashboardPage(QWidget):
             self.welcome_subtitle,
         ] + self._action_cards + [self.activity_section]
         QTimer.singleShot(50, lambda: StaggerAnimationHelper.stagger_widgets(widgets))
-

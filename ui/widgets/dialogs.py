@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Özel Modern Diyalog Bileşenleri
-Çerçevesiz, gölgeli, animasyonsuz (veya hafif animasyonlu) ve projenin koyu renkli temasına
-uygun özel QDialog sınıfları.
+Çerçevesiz, gölgeli, projenin temasına uygun ve QSS uyumlu özel QDialog sınıfları.
 """
 
 from PyQt6.QtWidgets import (
@@ -10,9 +9,10 @@ from PyQt6.QtWidgets import (
     QPushButton, QLineEdit, QFrame, QGraphicsDropShadowEffect,
     QTextEdit, QTextBrowser, QComboBox
 )
-from PyQt6.QtCore import Qt, QPoint, pyqtSignal
-from PyQt6.QtGui import QColor, QFont
+from PyQt6.QtCore import Qt, QPoint
+from PyQt6.QtGui import QColor
 import qtawesome as qta
+from core.utils import CATEGORIES, format_date_tr
 
 
 class BaseModernDialog(QDialog):
@@ -32,13 +32,6 @@ class BaseModernDialog(QDialog):
         # Ana içerik çerçevesi
         self.container = QFrame()
         self.container.setObjectName("dialog_container")
-        self.container.setStyleSheet(
-            "QFrame#dialog_container { "
-            "  background: #0e0e11; "
-            "  border: 1px solid #27272a; "
-            "  border-radius: 12px; "
-            "}"
-        )
         self.outer_layout.addWidget(self.container)
 
         # Yumuşak gölge efekti
@@ -61,11 +54,12 @@ class BaseModernDialog(QDialog):
         self.header_layout.addWidget(self.title_icon)
 
         self.title_label = QLabel()
-        self.title_label.setStyleSheet("color: #f4f4f5; font-weight: 700; font-size: 14px;")
+        self.title_label.setObjectName("dialog_title")
         self.header_layout.addWidget(self.title_label, stretch=1)
 
         # Kapatma (X) Butonu
         self.close_btn = QPushButton()
+        self.close_btn.setObjectName("close_btn")
         self.close_btn.setFixedSize(20, 20)
         self.close_btn.setIcon(qta.icon("mdi6.close", color="#a0a0b8"))
         self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -100,27 +94,15 @@ class ModernInputDialog(BaseModernDialog):
 
         # Açıklama etiketi
         self.info_label = QLabel(label_text)
-        self.info_label.setStyleSheet("color: #a0a0b8; font-size: 13px;")
+        self.info_label.setObjectName("dialog_info_label")
         self.info_label.setWordWrap(True)
         self.layout.addWidget(self.info_label)
 
         # Metin girdi kutusu
         self.input_field = QLineEdit()
+        self.input_field.setObjectName("dialog_input")
         self.input_field.setPlaceholderText(placeholder)
         self.input_field.setMinimumHeight(38)
-        self.input_field.setStyleSheet(
-            "QLineEdit {"
-            "  background: #18181b; "
-            "  border: 1px solid #27272a; "
-            "  border-radius: 8px; "
-            "  padding: 6px 12px; "
-            "  color: #f4f4f5; "
-            "  font-size: 13px; "
-            "}"
-            "QLineEdit:focus {"
-            "  border-color: #10B981; "
-            "}"
-        )
         self.input_field.returnPressed.connect(self.accept)
         self.layout.addWidget(self.input_field)
 
@@ -131,45 +113,17 @@ class ModernInputDialog(BaseModernDialog):
 
         # İptal butonu
         self.cancel_btn = QPushButton("İptal")
+        self.cancel_btn.setObjectName("cancel_btn")
         self.cancel_btn.setMinimumHeight(34)
         self.cancel_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.cancel_btn.setStyleSheet(
-            "QPushButton {"
-            "  background: #18181b; "
-            "  border: 1px solid #27272a; "
-            "  border-radius: 6px; "
-            "  color: #a1a1aa; "
-            "  padding: 0 16px; "
-            "  font-weight: 600; "
-            "}"
-            "QPushButton:hover {"
-            "  border-color: #10B981; "
-            "  color: #ffffff; "
-            "}"
-        )
         self.cancel_btn.clicked.connect(self.reject)
         btn_layout.addWidget(self.cancel_btn)
 
         # Onayla/Ekle butonu
         self.ok_btn = QPushButton("Ekle")
+        self.ok_btn.setObjectName("save_btn")
         self.ok_btn.setMinimumHeight(34)
         self.ok_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.ok_btn.setStyleSheet(
-            "QPushButton {"
-            "  background: #10B981; "
-            "  border: none; "
-            "  border-radius: 6px; "
-            "  color: #09090b; "
-            "  padding: 0 20px; "
-            "  font-weight: 600; "
-            "}"
-            "QPushButton:hover {"
-            "  background: #34d399; "
-            "}"
-            "QPushButton:pressed {"
-            "  background: #059669; "
-            "}"
-        )
         self.ok_btn.clicked.connect(self.accept)
         btn_layout.addWidget(self.ok_btn)
 
@@ -216,7 +170,7 @@ class ModernConfirmDialog(BaseModernDialog):
 
         # Mesaj metni
         self.msg_label = QLabel(message)
-        self.msg_label.setStyleSheet("color: #f4f4f5; font-size: 13px; line-height: 1.4;")
+        self.msg_label.setObjectName("dialog_info_label")
         self.msg_label.setWordWrap(True)
         content_layout.addWidget(self.msg_label, stretch=1)
 
@@ -229,22 +183,9 @@ class ModernConfirmDialog(BaseModernDialog):
 
         # Hayır / İptal butonu
         self.no_btn = QPushButton("Hayır")
+        self.no_btn.setObjectName("cancel_btn")
         self.no_btn.setMinimumHeight(34)
         self.no_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.no_btn.setStyleSheet(
-            "QPushButton {"
-            "  background: #18181b; "
-            "  border: 1px solid #27272a; "
-            "  border-radius: 6px; "
-            "  color: #a1a1aa; "
-            "  padding: 0 18px; "
-            "  font-weight: 600; "
-            "}"
-            "QPushButton:hover {"
-            "  border-color: #10B981; "
-            "  color: #ffffff; "
-            "}"
-        )
         self.no_btn.clicked.connect(self.reject)
         btn_layout.addWidget(self.no_btn)
 
@@ -253,41 +194,11 @@ class ModernConfirmDialog(BaseModernDialog):
         self.yes_btn.setMinimumHeight(34)
         self.yes_btn.setCursor(Qt.CursorShape.PointingHandCursor)
 
-        # Eğer tehlikeli bir işlemse (örn. Silme), onay butonunu kırmızı yapıyoruz
+        # Eğer tehlikeli bir işlemse onay butonunu danger_btn, değilse save_btn yapıyoruz
         if is_danger:
-            self.yes_btn.setStyleSheet(
-                "QPushButton {"
-                "  background: #FF5252; "
-                "  border: none; "
-                "  border-radius: 6px; "
-                "  color: #ffffff; "
-                "  padding: 0 22px; "
-                "  font-weight: 600; "
-                "}"
-                "QPushButton:hover {"
-                "  background: #FF7A7A; "
-                "}"
-                "QPushButton:pressed {"
-                "  background: #D32F2F; "
-                "}"
-            )
+            self.yes_btn.setObjectName("danger_btn")
         else:
-            self.yes_btn.setStyleSheet(
-                "QPushButton {"
-                "  background: #10B981; "
-                "  border: none; "
-                "  border-radius: 6px; "
-                "  color: #09090b; "
-                "  padding: 0 22px; "
-                "  font-weight: 600; "
-                "}"
-                "QPushButton:hover {"
-                "  background: #34d399; "
-                "}"
-                "QPushButton:pressed {"
-                "  background: #059669; "
-                "}"
-            )
+            self.yes_btn.setObjectName("save_btn")
 
         self.yes_btn.clicked.connect(self.accept)
         btn_layout.addWidget(self.yes_btn)
@@ -324,13 +235,9 @@ class NoteDetailDialog(BaseModernDialog):
         
         # Markdown Önizleme / Düzenleme Toggle Butonu
         self.preview_toggle_btn = QPushButton("Önizleme Modu")
+        self.preview_toggle_btn.setObjectName("secondary_btn")
         self.preview_toggle_btn.setFixedSize(120, 28)
         self.preview_toggle_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.preview_toggle_btn.setStyleSheet(
-            "QPushButton { background: rgba(16, 185, 129, 0.12); border: 1px solid #10B981;"
-            " border-radius: 6px; color: #10B981; font-size: 11px; font-weight: 600; }"
-            "QPushButton:hover { background: rgba(16, 185, 129, 0.2); }"
-        )
         self.preview_toggle_btn.clicked.connect(self._toggle_preview_mode)
         self.preview_toggle_btn.setVisible(False) # Sadece edit modundayken aktif olacak
         self.top_buttons_layout.addWidget(self.preview_toggle_btn)
@@ -339,13 +246,9 @@ class NoteDetailDialog(BaseModernDialog):
         
         # Düzenle / Kaydet Butonu
         self.edit_save_btn = QPushButton("Düzenle")
+        self.edit_save_btn.setObjectName("secondary_btn")
         self.edit_save_btn.setFixedSize(100, 28)
         self.edit_save_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.edit_save_btn.setStyleSheet(
-            "QPushButton { background: #18181b; border: 1px solid #27272a;"
-            " border-radius: 6px; color: #a1a1aa; font-weight: 600; font-size: 12px; }"
-            "QPushButton:hover { border-color: #10B981; color: #ffffff; }"
-        )
         self.edit_save_btn.clicked.connect(self._on_edit_save_clicked)
         self.top_buttons_layout.addWidget(self.edit_save_btn)
         
@@ -359,22 +262,19 @@ class NoteDetailDialog(BaseModernDialog):
 
         # Not Başlığı (Görünüm)
         self.lbl_title = QLabel(note_data.get("title", ""))
-        self.lbl_title.setStyleSheet("font-size: 20px; font-weight: 700; color: #f4f4f5;")
+        self.lbl_title.setObjectName("page_title")
         self.lbl_title.setWordWrap(True)
         self.view_layout.addWidget(self.lbl_title)
 
         # Kategori & Tarih & Etiketler
         self.lbl_meta = QLabel()
-        self.lbl_meta.setStyleSheet("font-size: 12px; color: #71717a;")
+        self.lbl_meta.setObjectName("page_subtitle")
         self._update_meta_label()
         self.view_layout.addWidget(self.lbl_meta)
 
         # Not İçeriği (Markdown Rendered/Düz Metin)
         self.txt_browser = QTextBrowser()
-        self.txt_browser.setStyleSheet(
-            "QTextBrowser { background: transparent; border: none; color: #d4d4d8;"
-            " font-size: 14px; line-height: 1.6; }"
-        )
+        self.txt_browser.setObjectName("txt_browser")
         # Markdown olarak ayarla
         self.txt_browser.setMarkdown(note_data.get("content", ""))
         self.view_layout.addWidget(self.txt_browser)
@@ -389,13 +289,9 @@ class NoteDetailDialog(BaseModernDialog):
 
         # Başlık Edit
         self.input_title = QLineEdit(note_data.get("title", ""))
+        self.input_title.setObjectName("note_title_input")
         self.input_title.setPlaceholderText("Not başlığı...")
         self.input_title.setMinimumHeight(38)
-        self.input_title.setStyleSheet(
-            "QLineEdit { background: #18181b; border: 1px solid #27272a; border-radius: 8px;"
-            " padding: 6px 12px; color: #f4f4f5; font-size: 14px; font-weight: 600; }"
-            "QLineEdit:focus { border-color: #10B981; }"
-        )
         self.edit_layout.addWidget(self.input_title)
 
         # Kategori & Etiketler Yan Yana
@@ -404,39 +300,25 @@ class NoteDetailDialog(BaseModernDialog):
 
         # Kategori Seçici
         self.combo_category = QComboBox()
-        self.combo_category.addItems(["Genel", "İş", "Kişisel", "Proje", "Fikir"])
+        self.combo_category.setObjectName("category_combo")
+        self.combo_category.addItems(CATEGORIES)
         self.combo_category.setCurrentText(note_data.get("category", "Genel"))
         self.combo_category.setMinimumHeight(38)
-        self.combo_category.setStyleSheet(
-            "QComboBox { background: #18181b; border: 1px solid #27272a; border-radius: 8px;"
-            " padding: 6px 12px; color: #f4f4f5; font-size: 13px; min-width: 140px; }"
-            "QComboBox:focus { border-color: #10B981; }"
-            "QComboBox QAbstractItemView { background: #18181b; color: #f4f4f5;"
-            " selection-background-color: #10B981; border: 1px solid #27272a; }"
-        )
         cat_tags_layout.addWidget(self.combo_category)
 
         # Etiket Girişi
         self.input_tags = QLineEdit(", ".join(note_data.get("tags", [])))
+        self.input_tags.setObjectName("note_tags_input")
         self.input_tags.setPlaceholderText("Etiketler (virgülle ayırın: proje, fikir...)")
         self.input_tags.setMinimumHeight(38)
-        self.input_tags.setStyleSheet(
-            "QLineEdit { background: #18181b; border: 1px solid #27272a; border-radius: 8px;"
-            " padding: 6px 12px; color: #f4f4f5; font-size: 13px; }"
-            "QLineEdit:focus { border-color: #10B981; }"
-        )
         cat_tags_layout.addWidget(self.input_tags, stretch=1)
         self.edit_layout.addLayout(cat_tags_layout)
 
         # Editör (QTextEdit)
         self.editor = QTextEdit()
+        self.editor.setObjectName("note_editor")
         self.editor.setPlainText(note_data.get("content", ""))
         self.editor.setMinimumHeight(240)
-        self.editor.setStyleSheet(
-            "QTextEdit { background: #18181b; border: 1px solid #27272a; border-radius: 8px;"
-            " padding: 12px; color: #f4f4f5; font-size: 14px; line-height: 1.5; }"
-            "QTextEdit:focus { border-color: #10B981; }"
-        )
         self.edit_layout.addWidget(self.editor)
 
         self.layout.addWidget(self.edit_panel, stretch=1)
@@ -447,14 +329,10 @@ class NoteDetailDialog(BaseModernDialog):
         self.bottom_buttons.addStretch()
         
         self.close_dialog_btn = QPushButton("Kapat")
+        self.close_dialog_btn.setObjectName("cancel_btn")
         self.close_dialog_btn.setMinimumHeight(36)
         self.close_dialog_btn.setMinimumWidth(100)
         self.close_dialog_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.close_dialog_btn.setStyleSheet(
-            "QPushButton { background: #18181b; border: 1px solid #27272a;"
-            " border-radius: 8px; color: #a1a1aa; font-weight: 600; padding: 0 16px; }"
-            "QPushButton:hover { border-color: #10B981; color: #ffffff; }"
-        )
         self.close_dialog_btn.clicked.connect(self.accept)
         self.bottom_buttons.addWidget(self.close_dialog_btn)
         
@@ -466,7 +344,8 @@ class NoteDetailDialog(BaseModernDialog):
         date = self.note_data.get("date", "")
         tags = self.note_data.get("tags", [])
         
-        meta_text = f"📂 {cat}   •   📅 {date}"
+        formatted_date = format_date_tr(date)
+        meta_text = f"📂 {cat}   •   📅 {formatted_date}"
         if tags:
             meta_text += f"   •   🏷️ {', '.join(tags)}"
         self.lbl_meta.setText(meta_text)
@@ -494,11 +373,9 @@ class NoteDetailDialog(BaseModernDialog):
             # Düzenleme Moduna Giriş
             self.is_edit_mode = True
             self.edit_save_btn.setText("Kaydet")
-            self.edit_save_btn.setStyleSheet(
-                "QPushButton { background: #10B981; border: none;"
-                " border-radius: 6px; color: #09090b; font-weight: 600; font-size: 12px; }"
-                "QPushButton:hover { background: #34d399; }"
-            )
+            self.edit_save_btn.setObjectName("save_btn")
+            self.edit_save_btn.style().unpolish(self.edit_save_btn)
+            self.edit_save_btn.style().polish(self.edit_save_btn)
             
             # Panelleri değiştir
             self.view_panel.setVisible(False)
@@ -543,15 +420,18 @@ class NoteDetailDialog(BaseModernDialog):
                 self.lbl_title.setText(title)
                 self.txt_browser.setMarkdown(content)
                 self._update_meta_label()
+                from ui.toast import ToastManager
+                ToastManager.show(self, "Başarılı", "Notunuz başarıyla güncellendi.", "success")
+            else:
+                from ui.toast import ToastManager
+                ToastManager.show(self, "Hata", "Not güncellenirken bir sorun oluştu.", "error")
 
             # Görünüm Moduna Geri Dönüş
             self.is_edit_mode = False
             self.edit_save_btn.setText("Düzenle")
-            self.edit_save_btn.setStyleSheet(
-                "QPushButton { background: #18181b; border: 1px solid #27272a;"
-                " border-radius: 6px; color: #a1a1aa; font-weight: 600; font-size: 12px; }"
-                "QPushButton:hover { border-color: #10B981; color: #ffffff; }"
-            )
+            self.edit_save_btn.setObjectName("secondary_btn")
+            self.edit_save_btn.style().unpolish(self.edit_save_btn)
+            self.edit_save_btn.style().polish(self.edit_save_btn)
             
             self.view_panel.setVisible(True)
             self.edit_panel.setVisible(False)

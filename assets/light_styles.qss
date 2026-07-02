@@ -431,3 +431,256 @@ QDialog {
     background-color: #ffffff;
     border: 1px solid #e4e4e7;
 }
+
+/* ---- Eklenen Widget ve Stil Kuralları (Faz 1) ---- */
+
+/* Hızlı eylem kartı */
+QFrame#hover_card QLabel#card_title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #18181b;
+    background: transparent;
+}
+
+QFrame#hover_card QLabel#card_description {
+    font-size: 12px;
+    color: #71717a;
+    background: transparent;
+}
+
+/* Dashboard son aktiviteler */
+QLabel#section_title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #18181b;
+}
+
+QLabel#activity_row {
+    font-size: 13px;
+    color: #4b5563;
+    padding: 6px 0px;
+    border-bottom: 1px solid #e4e4e7;
+}
+
+QLabel#activity_row_empty {
+    font-size: 13px;
+    color: #9ca3af;
+    padding: 6px 0px;
+    font-style: italic;
+}
+
+/* Yeni Not / Form Etiketleri */
+QLabel#form_label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #71717a;
+}
+
+QFrame#form_frame {
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 12px;
+}
+
+QPushButton#cancel_btn {
+    background: transparent;
+    border: 1px solid #e4e4e7;
+    border-radius: 8px;
+    color: #71717a;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 24px;
+}
+
+QPushButton#cancel_btn:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+QPushButton#save_btn {
+    background: #10B981;
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 24px;
+}
+
+QPushButton#save_btn:hover {
+    background: #34d399;
+}
+
+QPushButton#save_btn:disabled {
+    background: #e4e4e7;
+    color: #a1a1aa;
+}
+
+QLabel#hint_label {
+    font-size: 12px;
+    color: #71717a;
+    font-style: italic;
+    margin-top: 8px;
+}
+
+/* Not Kartı */
+QLabel#note_card_title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #18181b;
+    background: transparent;
+}
+
+QLabel#note_card_preview {
+    font-size: 12px;
+    color: #71717a;
+    background: transparent;
+}
+
+QLabel#note_card_date {
+    font-size: 11px;
+    color: #a1a1aa;
+    background: transparent;
+}
+
+QLabel#category_tag {
+    font-size: 10px;
+    color: #059669;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-weight: 600;
+}
+
+QPushButton#delete_btn {
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+}
+
+QPushButton#delete_btn:hover {
+    background: rgba(255, 82, 82, 0.15);
+}
+
+/* Hedef Sayfası ve Ögeleri */
+QFrame#goal_item {
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 10px;
+}
+
+QLabel#goal_text {
+    font-size: 14px;
+    color: #18181b;
+}
+
+QLabel#goal_text[completed="true"] {
+    color: #a1a1aa;
+}
+
+QLabel#lbl_progress {
+    font-size: 11px;
+    color: #71717a;
+}
+
+QLabel#lbl_progress[completed="true"] {
+    color: #b5b5be;
+}
+
+/* İlerleme Çubuğu (ProgressBar) */
+QProgressBar {
+    border: 1px solid #e4e4e7;
+    background-color: #ffffff;
+    border-radius: 8px;
+    text-align: center;
+    color: #18181b;
+    font-weight: bold;
+    height: 20px;
+}
+
+QProgressBar::chunk {
+    background-color: #059669;
+    border-radius: 7px;
+}
+
+/* İstatistik Kartı ve Değerler */
+QLabel#stat_value {
+    font-size: 26px;
+    font-weight: 800;
+    color: #18181b;
+}
+
+QLabel#stat_label {
+    font-size: 12px;
+    color: #71717a;
+    font-weight: 500;
+}
+
+QFrame#activity_summary {
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 12px;
+}
+
+/* Ayarlar */
+QFrame#settings_group {
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 12px;
+}
+
+QLabel#group_title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #18181b;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e4e4e7;
+}
+
+QLabel#setting_label_text {
+    font-size: 14px;
+    color: #71717a;
+}
+
+QLabel#setting_value_text {
+    font-size: 14px;
+    color: #18181b;
+}
+
+/* Diyaloglar */
+QFrame#dialog_container {
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 12px;
+}
+
+QLabel#dialog_title {
+    color: #18181b;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+QLabel#dialog_info_label {
+    color: #71717a;
+    font-size: 13px;
+}
+
+/* Toast Bildirimleri */
+QFrame#toast_widget {
+    background-color: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 8px;
+}
+
+QLabel#toast_title {
+    font-weight: bold;
+    font-size: 13px;
+    color: #18181b;
+}
+
+QLabel#toast_message {
+    font-size: 12px;
+    color: #71717a;
+}
+
+

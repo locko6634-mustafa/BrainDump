@@ -7,26 +7,28 @@ Tüm notları grid düzeninde gösteren sayfa: arama, filtreleme ve not kartlar�
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QLineEdit, QPushButton, QFrame, QGridLayout,
-    QScrollArea, QGraphicsDropShadowEffect,
-    QGraphicsOpacityEffect, QMenu
+    QScrollArea, QMenu, QComboBox
 )
 from PyQt6.QtCore import (
-    Qt, QTimer, QPropertyAnimation, QEasingCurve, pyqtSignal
+    Qt, QTimer, pyqtSignal
 )
-from PyQt6.QtGui import QColor
+from PyQt6.QtGui import QResizeEvent
 import qtawesome as qta
 from core.json_manager import JSONManager
-from ui.animations import HoverCard, StaggerAnimationHelper, TactileButton
+from core.utils import CATEGORIES, format_date_tr
+from ui.animations import HoverCard, StaggerAnimationHelper
 
 
 class NoteCard(HoverCard):
     """Tek bir not kartı bileşeni."""
     delete_clicked = pyqtSignal(str)
+    pin_clicked = pyqtSignal(str, bool)
     clicked = pyqtSignal(str)
 
-    def __init__(self, note_id: str, title: str, preview: str, date: str, category: str, parent=None):
+    def __init__(self, note_id: str, title: str, preview: str, date: str, category: str, is_pinned: bool = False, parent=None):
         super().__init__(parent)
         self.note_id = note_id
+        self.is_pinned = is_pinned
         self.setObjectName("hover_card")
         self.setMinimumHeight(160)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -35,17 +37,24 @@ class NoteCard(HoverCard):
         layout.setContentsMargins(16, 16, 16, 16)
         layout.setSpacing(8)
 
-        # Başlık ve sil butonu satırı
+        # Başlık ve butonlar satırı
         title_row = QHBoxLayout()
         title_row.setSpacing(8)
 
         # Not başlığı
         title_label = QLabel(title)
         title_label.setObjectName("note_card_title")
-        title_label.setStyleSheet(
-            "font-size: 15px; font-weight: 700; color: #e8e8e8; background: transparent;"
-        )
         title_row.addWidget(title_label, stretch=1)
+
+        # Sabitleme (Pin) butonu
+        self.pin_btn = QPushButton()
+        self.pin_btn.setObjectName("pin_btn")
+        self.pin_btn.setFixedSize(24, 24)
+        self.pin_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.pin_btn.setStyleSheet("QPushButton { background: transparent; border: none; }")
+        self.pin_btn.clicked.connect(self._on_pin_clicked)
+        self.update_pin_icon()
+        title_row.addWidget(self.pin_btn)
 
         # Sil butonu
         self.delete_btn = QPushButton()
@@ -53,10 +62,7 @@ class NoteCard(HoverCard):
         self.delete_btn.setIcon(qta.icon("mdi6.trash-can-outline", color="#FF5252"))
         self.delete_btn.setFixedSize(24, 24)
         self.delete_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.delete_btn.setStyleSheet(
-            "QPushButton { background: transparent; border: none; border-radius: 4px; }"
-            "QPushButton:hover { background: rgba(255, 82, 82, 0.15); }"
-        )
+        self.delete_btn.setStyleSheet("QPushButton { background: transparent; border: none; }")
         self.delete_btn.clicked.connect(self._on_delete_clicked)
         title_row.addWidget(self.delete_btn)
 
@@ -69,7 +75,6 @@ class NoteCard(HoverCard):
         preview_label = QLabel(preview)
         preview_label.setObjectName("note_card_preview")
         preview_label.setWordWrap(True)
-        preview_label.setStyleSheet("font-size: 12px; color: #a0a0b8; background: transparent;")
         layout.addWidget(preview_label)
 
         layout.addStretch()
@@ -79,7 +84,7 @@ class NoteCard(HoverCard):
         bottom_row.setSpacing(8)
 
         date_label = QLabel(date)
-        date_label.setStyleSheet("font-size: 11px; color: #6a6a8a; background: transparent;")
+        date_label.setObjectName("note_card_date")
         bottom_row.addWidget(date_label)
 
         bottom_row.addStretch()
@@ -87,24 +92,33 @@ class NoteCard(HoverCard):
         # Kategori etiketi
         category_tag = QLabel(category)
         category_tag.setObjectName("category_tag")
-        category_tag.setStyleSheet(
-            "font-size: 10px; color: #10B981; background: rgba(16,185,129,0.12);"
-            " border-radius: 4px; padding: 2px 8px; font-weight: 600;"
-        )
         bottom_row.addWidget(category_tag)
 
         layout.addLayout(bottom_row)
+
+    def update_pin_icon(self):
+        """Pin ikonunu durumuna göre günceller."""
+        if self.is_pinned:
+            self.pin_btn.setIcon(qta.icon("mdi6.pin", color="#10B981"))
+        else:
+            self.pin_btn.setIcon(qta.icon("mdi6.pin-outline", color="#71717a"))
+
+    def _on_pin_clicked(self):
+        """Sabitleme butonu tıklandığında durumu tersine çevirip sinyal yayar."""
+        self.is_pinned = not self.is_pinned
+        self.update_pin_icon()
+        self.pin_clicked.emit(self.note_id, self.is_pinned)
 
     def _on_delete_clicked(self):
         """Silme butonuna tıklandığında silme sinyalini tetikler."""
         self.delete_clicked.emit(self.note_id)
 
     def mousePressEvent(self, event):
-        """Kart tıklandığında, silme butonuna tıklanmadıysa clicked sinyalini yayar."""
+        """Kart tıklandığında, butonlara tıklanmadıysa clicked sinyalini yayar."""
         if event.button() == Qt.MouseButton.LeftButton:
-            # Fare silme butonunun üzerinde değilse tıklamayı kabul et
             pos = event.position().toPoint()
-            if not self.delete_btn.geometry().contains(pos):
+            # Silme veya Pin butonuna tıklanmadıysa detay aç
+            if not self.delete_btn.geometry().contains(pos) and not self.pin_btn.geometry().contains(pos):
                 self.clicked.emit(self.note_id)
         super().mousePressEvent(event)
 
@@ -117,6 +131,7 @@ class NotesPage(QWidget):
         self.setObjectName("notes_page")
         self.db = JSONManager()
         self.selected_category = "Hepsi"
+        self.current_cols = 3 # Varsayılan sütun sayısı
 
         # --- Ana düzen ---
         outer_layout = QVBoxLayout(self)
@@ -146,14 +161,11 @@ class NotesPage(QWidget):
 
         page_title = QLabel("Notlarım")
         page_title.setObjectName("page_title")
-        page_title.setStyleSheet(
-            "font-size: 24px; font-weight: 700; color: #e8e8e8;"
-        )
         title_row.addWidget(page_title)
         title_row.addStretch()
         self.content_layout.addLayout(title_row)
 
-        # --- Üst bar: Arama + Filtre ---
+        # --- Üst bar: Arama + Sıralama + Filtre ---
         search_bar = QHBoxLayout()
         search_bar.setSpacing(12)
 
@@ -161,13 +173,16 @@ class NotesPage(QWidget):
         self.search_input.setObjectName("search_input")
         self.search_input.setPlaceholderText("Notlarda ara...")
         self.search_input.setMinimumHeight(40)
-        self.search_input.setStyleSheet(
-            "QLineEdit { background: #18181b; border: 1px solid #27272a;"
-            " border-radius: 8px; padding: 8px 12px; color: #f4f4f5;"
-            " font-size: 14px; }"
-            "QLineEdit:focus { border-color: #10B981; }"
-        )
         search_bar.addWidget(self.search_input, stretch=1)
+
+        # Sıralama Kutusu (Faz 3)
+        self.sort_combo = QComboBox()
+        self.sort_combo.setObjectName("sort_combo")
+        self.sort_combo.addItems(["En Yeni", "En Eski", "A-Z Başlık", "Z-A Başlık", "Kategori"])
+        self.sort_combo.setMinimumHeight(40)
+        self.sort_combo.setMinimumWidth(110)
+        self.sort_combo.currentIndexChanged.connect(self.load_notes)
+        search_bar.addWidget(self.sort_combo)
 
         # Filtre butonu
         filter_btn = QPushButton()
@@ -175,25 +190,17 @@ class NotesPage(QWidget):
         filter_btn.setIcon(qta.icon("mdi6.filter-variant", color="#a0a0b8"))
         filter_btn.setMinimumSize(40, 40)
         filter_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        filter_btn.setStyleSheet(
-            "QPushButton { background: #18181b; border: 1px solid #27272a;"
-            " border-radius: 8px; }"
-            "QPushButton:hover { border-color: #10B981; }"
-        )
-        
+
         # Filtre menüsü
         self.filter_menu = QMenu(self)
-        categories = ["Hepsi", "Genel", "İş", "Kişisel", "Proje", "Fikir"]
-        for cat in categories:
-            action = self.filter_menu.addAction(cat)
-            action.triggered.connect(lambda checked, c=cat: self._on_filter_changed(c))
+        self.reload_categories()
         
         filter_btn.setMenu(self.filter_menu)
         search_bar.addWidget(filter_btn)
 
         self.content_layout.addLayout(search_bar)
 
-        # --- Not kartları grid'i (3 sütun) ---
+        # --- Not kartları grid'i ---
         self.grid_layout = QGridLayout()
         self.grid_layout.setSpacing(16)
         self.content_layout.addLayout(self.grid_layout)
@@ -202,9 +209,6 @@ class NotesPage(QWidget):
         self.info_label = QLabel("0 not bulundu")
         self.info_label.setObjectName("notes_count")
         self.info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.info_label.setStyleSheet(
-            "font-size: 12px; color: #6a6a8a; margin-top: 16px;"
-        )
         self.content_layout.addWidget(self.info_label)
 
         self.content_layout.addStretch()
@@ -218,6 +222,19 @@ class NotesPage(QWidget):
         # Notları ilk defa yükle
         self.load_notes()
 
+    def reload_categories(self):
+        """Kategori filtre menüsünü ve mevcut seçim durumunu günceller."""
+        self.filter_menu.clear()
+        categories = ["Hepsi"] + CATEGORIES
+        for cat in categories:
+            action = self.filter_menu.addAction(cat)
+            action.triggered.connect(lambda checked, c=cat: self._on_filter_changed(c))
+        
+        # Seçili kategori silindiyse "Hepsi"ye sıfırla
+        if self.selected_category != "Hepsi" and self.selected_category not in CATEGORIES:
+            self.selected_category = "Hepsi"
+            self.load_notes()
+
     def _clear_grid(self):
         """Grid'deki tüm kartları ve düzen elemanlarını temizler."""
         while self.grid_layout.count():
@@ -227,7 +244,7 @@ class NotesPage(QWidget):
                 widget.deleteLater()
 
     def load_notes(self):
-        """Notları JSON dosyasından yükler, arama ve filtreye göre süzüp listeler."""
+        """Notları JSON dosyasından yükler, arama, filtre ve sıralamaya göre listeler."""
         self._clear_grid()
         notes = self.db.get_all_notes()
         
@@ -244,28 +261,51 @@ class NotesPage(QWidget):
                 title_match = search_text in note.get("title", "").lower()
                 content_match = search_text in note.get("content", "").lower()
                 category_match = search_text in note.get("category", "").lower()
-                # Etiket araması
                 tags_match = any(search_text in tag.lower() for tag in note.get("tags", []))
                 if not (title_match or content_match or category_match or tags_match):
                     continue
             
             filtered_notes.append(note)
 
-        # Kartları oluştur ve grid'e ekle (3 sütun)
+        # --- Sıralama Mantığı (Faz 3) ---
+        sort_choice = self.sort_combo.currentText()
+        
+        def sort_key(note):
+            note_date = note.get("date", "")
+            note_title = note.get("title", "").lower()
+            note_category = note.get("category", "").lower()
+            
+            if sort_choice in ["En Yeni", "En Eski"]:
+                return note_date
+            elif sort_choice in ["A-Z Başlık", "Z-A Başlık"]:
+                return note_title
+            elif sort_choice == "Kategori":
+                return note_category
+            return note_date
+
+        reverse_sort = (sort_choice == "En Yeni" or sort_choice == "Z-A Başlık")
+        filtered_notes.sort(key=sort_key, reverse=reverse_sort)
+        
+        # Sabitlenen (Pinned) notları stabil olarak en tepeye uçur
+        filtered_notes.sort(key=lambda x: not x.get("is_pinned", False))
+
+        # Kartları oluştur ve grid'e ekle
         cards = []
         for i, note in enumerate(filtered_notes):
             card = NoteCard(
                 note_id=note["id"],
                 title=note["title"],
                 preview=note["content"],
-                date=note["date"],
-                category=note["category"]
+                date=format_date_tr(note["date"]),
+                category=note["category"],
+                is_pinned=note.get("is_pinned", False)
             )
             card.delete_clicked.connect(self._on_delete_note)
+            card.pin_clicked.connect(self._on_pin_clicked)
             card.clicked.connect(self._on_note_clicked)
             
-            row = i // 3
-            col = i % 3
+            row = i // self.current_cols
+            col = i % self.current_cols
             self.grid_layout.addWidget(card, row, col)
             cards.append(card)
 
@@ -275,6 +315,51 @@ class NotesPage(QWidget):
         # Staggered entry animasyonunu tetikle
         if cards:
             QTimer.singleShot(30, lambda: StaggerAnimationHelper.stagger_widgets(cards))
+
+    def _on_pin_clicked(self, note_id, is_pinned):
+        """Notun pinlenme durumu değiştiğinde kaydeder ve yeniden yükler."""
+        if self.db.update_note_pin(note_id, is_pinned):
+            self.load_notes()
+            from ui.toast import ToastManager
+            msg = "Not en üste sabitlendi." if is_pinned else "Notun sabitlemesi kaldırıldı."
+            ToastManager.show(self, "Başarılı", msg, "success")
+
+    def resizeEvent(self, event: QResizeEvent):
+        """Pencere yeniden boyutlandırıldığında responsive grid yapısını ayarlar."""
+        super().resizeEvent(event)
+        width = self.width()
+        
+        # Genişliğe göre sütun sayısını hesapla
+        if width < 550:
+            new_cols = 1
+        elif width < 850:
+            new_cols = 2
+        elif width < 1150:
+            new_cols = 3
+        else:
+            new_cols = 4
+            
+        if self.current_cols != new_cols:
+            self.current_cols = new_cols
+            self.rearrange_grid()
+
+    def rearrange_grid(self):
+        """Mevcut kartları yenilemeden grid üzerinde yeniden dağıtır (Performanslı Reflow)."""
+        widgets = []
+        for i in range(self.grid_layout.count()):
+            item = self.grid_layout.itemAt(i)
+            if item and item.widget():
+                widgets.append(item.widget())
+                
+        # Widget'ları grid'den sök
+        for w in widgets:
+            self.grid_layout.removeWidget(w)
+            
+        # Yeni sütun yapısıyla tekrar yerleştir
+        for idx, w in enumerate(widgets):
+            row = idx // self.current_cols
+            col = idx % self.current_cols
+            self.grid_layout.addWidget(w, row, col)
 
     def _on_filter_changed(self, category):
         """Filtre değiştiğinde listeyi günceller."""
@@ -294,6 +379,8 @@ class NotesPage(QWidget):
         if ok:
             if self.db.delete_note(note_id):
                 self.load_notes()
+                from ui.toast import ToastManager
+                ToastManager.show(self, "Başarılı", "Not başarıyla silindi.", "success")
 
     def _on_note_clicked(self, note_id):
         """Bir not kartına tıklandığında detay diyalogunu açar."""
@@ -304,4 +391,3 @@ class NotesPage(QWidget):
             dialog = NoteDetailDialog(note, self)
             dialog.exec()
             self.load_notes()  # Değişiklik yapılmış olabileceği için listeyi yenile
-
