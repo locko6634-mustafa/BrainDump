@@ -2,11 +2,12 @@
     {
         "id": "1de627fa-efe4-4bed-9282-244feb747eab",
         "text": "git ve github detaylı öğrenilicek",
-        "completed": false,
+        "completed": true,
         "period": "weekly",
-        "progress": 0,
+        "progress": 1,
         "total_progress": 1,
-        "created_at": "2026-07-02"
+        "created_at": "2026-07-02",
+        "completed_at": "2026-07-02"
     },
     {
         "id": "3e4d1121-6eed-482d-820c-ceda8f5e526a",
